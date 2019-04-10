@@ -1,0 +1,100 @@
+
+<!-- table zwave_devices search -->
+<div>
+ <a class="btn btn-default" href="#api_settings" data-toggle="collapse"><i class="glyphicon glyphicon-cog"></i> <#LANG_SETUP#></a>
+ 	<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#about">About&nbsp;&nbsp;<span class="glyphicon glyphicon-info-sign icon-white"></span>
+	</button>
+    </div>
+<div class="collapse" id='api_settings'>&nbsp;
+&nbsp;
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+<fieldset>
+<div class="form-group">
+ <label class="col-lg-4 control-label">Cookie path
+ </label>
+ <div class="col-lg-6"><input class="form-control" type="text" name="cookie_file" value="<#COOKIE_FILE#>" class="input"></div>
+</div>
+<div class="form-group">
+ <label class="col-lg-4 control-label">Timeout update (min)
+ </label>
+ <div class="col-lg-6"><input class="form-control" type="text" name="timeout_update" value="<#TIMEOUT_UPDATE#>" class="input"></div>
+</div>
+<div class="form-group">
+ <label class="control-label">Debug</label>
+ <div class="controls"><input type="checkbox" name="debug" value="1"[#if DEBUG="1"#] checked[#endif#]></div>
+</div>
+<div class="form-actions">
+<button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+<input type="hidden" name="view_mode" value="update_settings">
+<input type="hidden" name="mode" value="update">
+</div>
+</fieldset>
+</form>
+</div>
+<br>
+<a class="btn btn-default" href="?view_mode=update_location" ><i class="glyphicon glyphicon-refresh"></i>Get locations</a>
+<br><br>
+<table class="table table-condensed table-hover table-striped">
+<thead class="thead-light">
+ <tr>
+  <td>&nbsp;</td>
+  <td scope="col">User</td>
+  <td scope="col">Location</td>
+  <td scope="col">Datetime</td>
+  <td scope="col">Battery</td>
+  <td scope="col">Send to GPS module</td>
+ </tr>
+</thead>
+<tbody>
+ [#begin LOCATIONS#]
+ <tr>
+  <td><img src="[#IMAGE#]" height="30px" onerror="this.src='../templates/google_location/none.jpg'"></td>
+  <td valign="top">[#NAME#]</td>
+  <td valign="top">[#ADDRESS#]</td>
+  <td valign="top">[#LASTUPDATE#]</td>
+  <td valign="top">[#BATTLEVEL#]%</td>
+  <td valign="top">[#if SENDTOGPS=="1"#]
+        <a class="btn btn-success" href="?view_mode=send_switch&id=[#ID_USER#]" >On</a>
+    [#else#]
+        <a class="btn btn-danger" href="?view_mode=send_switch&id=[#ID_USER#]" >Off</a>
+    [#endif SENDTOGPS#]
+  </td>
+ </tr>
+ [#end LOCATIONS#]
+ </tbody>
+</table>   
+ 
+
+<div class="modal fade" id="about" tabindex="-1" role="dialog" aria-labelledby="about1" aria-hidden="true">
+<!-- <div id="about" class="modal hide"> -->
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title">Google location</h4>
+			</div>
+			<div class="modal-body">
+				<div class="float-right">
+					<img src="../templates/google_location/image.png"  width="48" height="48">
+				</div>
+                <p class="float-left"> Модуль Google Location.<br>
+				Обсуждение модуля <a href="http://majordomo.smartliving.ru/forum/viewtopic.php?f=5&t=" target="_blank">здесь</a>.<br>
+				</p>
+				<hr size="1">
+				<p class="float-left">
+				Поддержать автора материально:
+				<ul>
+                    <li>Yandex: <a href="https://money.yandex.ru/to/410012076838296/100"  target="_blank">410012076838296</a></li>
+                    <li>WebMoney: R366396529511</li>
+                    <li><a href="https://connect.smartliving.ru/tasks/50.html"  target="_blank">Connect</a></li>
+				</ul>
+                </p>
+			</div>
+			
+			<div class="modal-footer">
+				<div class="pull-left">Telegram: <a href="https://telegram.me/Eraser1981" target="_blank">@Eraser1981</a> :)</div>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
