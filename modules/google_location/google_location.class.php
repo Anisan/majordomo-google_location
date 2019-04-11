@@ -131,6 +131,7 @@ function admin(&$out) {
  $this->getConfig();
  $out['COOKIE_FILE']=$this->config['COOKIE_FILE'];
  $out['TIMEOUT_UPDATE']=$this->config['TIMEOUT_UPDATE'];
+ $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
  $out['DEBUG']=$this->config['DEBUG'];
  if ($this->view_mode=='update_settings') {
    global $cookie_file;
@@ -211,6 +212,8 @@ function usual(&$out) {
 
             
     }
+    $this->config['LAST_UPDATE'] = date('Y-m-d H:i:s');
+    $this->saveConfig();
  }
  
  public function sendToGps($location)
@@ -264,7 +267,7 @@ function usual(&$out) {
  public function getLocationData() {
     $this->getConfig();
     //$ch = curl_init('https://www.google.com/maps/preview/locationsharing/read?authuser=0&pb=');
-    $ch = curl_init('https://www.google.com/maps/preview/locationsharing/read?authuser=0&hl=en&gl=us&pb=');
+    $ch = curl_init('https://www.google.com/maps/preview/locationsharing/read?authuser=0&hl='.SETTINGS_SITE_LANGUAGE.'&gl='.SETTINGS_SITE_LANGUAGE.'&pb=');
     curl_setopt($ch, CURLOPT_COOKIEJAR, $this->config['COOKIE_FILE']);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $this->config['COOKIE_FILE']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

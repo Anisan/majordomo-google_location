@@ -33,16 +33,18 @@
 </div>
 <br>
 <a class="btn btn-default" href="?view_mode=update_location" ><i class="glyphicon glyphicon-refresh"></i>Get locations</a>
+&nbsp;Last update: <#LAST_UPDATE#>
 <br><br>
 <table class="table table-condensed table-hover table-striped">
 <thead class="thead-light">
  <tr>
   <td>&nbsp;</td>
-  <td scope="col">User</td>
-  <td scope="col">Location</td>
-  <td scope="col">Datetime</td>
-  <td scope="col">Battery</td>
-  <td scope="col">Send to GPS module</td>
+  <td scope="col"><b>User</b></td>
+  <td scope="col"><b>Location</b></td>
+  <td scope="col"><b>Accuracy</b></td>
+  <td scope="col"><b>Last update</b></td>
+  <td scope="col"><b>Battery</b></td>
+  <td scope="col"><b>Send to GPS module</b></td>
  </tr>
 </thead>
 <tbody>
@@ -50,9 +52,13 @@
  <tr>
   <td><img src="[#IMAGE#]" height="30px" onerror="this.src='../templates/google_location/none.jpg'"></td>
   <td valign="top">[#NAME#]</td>
-  <td valign="top">[#ADDRESS#]</td>
+  <td valign="top"><a onclick="var url=('https://static-maps.yandex.ru/1.x/?ll=[#LON#],[#LAT#]&size=650,450&z=17&l=map&pt=[#LON#],[#LAT#],pm2blm');
+                        $.fancybox.open({'type': 'image',src: url});return false;">
+                        <i class="glyphicon glyphicon-map-marker"></i> [#ADDRESS#]
+                    </a></td>
+  <td valign="top">[#ACCURACY#]</td>
   <td valign="top">[#LASTUPDATE#]</td>
-  <td valign="top">[#BATTLEVEL#]%</td>
+  <td valign="top">[#if CHARGING=="1"#]<i class="glyphicon glyphicon-flash"> </i>[#endif CHARGING#][#BATTLEVEL#]%</td>
   <td valign="top">[#if SENDTOGPS=="1"#]
         <a class="btn btn-success" href="?view_mode=send_switch&id=[#ID_USER#]" >On</a>
     [#else#]
@@ -78,7 +84,7 @@
 					<img src="../templates/google_location/image.png"  width="48" height="48">
 				</div>
                 <p class="float-left"> Модуль Google Location.<br>
-				Обсуждение модуля <a href="http://majordomo.smartliving.ru/forum/viewtopic.php?f=5&t=" target="_blank">здесь</a>.<br>
+				Обсуждение модуля <a href="http://majordomo.smartliving.ru/forum/viewtopic.php?f=5&t=6309" target="_blank">здесь</a>.<br>
 				</p>
 				<hr size="1">
 				<p class="float-left">
@@ -86,7 +92,7 @@
 				<ul>
                     <li>Yandex: <a href="https://money.yandex.ru/to/410012076838296/100"  target="_blank">410012076838296</a></li>
                     <li>WebMoney: R366396529511</li>
-                    <li><a href="https://connect.smartliving.ru/tasks/50.html"  target="_blank">Connect</a></li>
+                    <li><a href="https://connect.smartliving.ru/tasks/435.html"  target="_blank">Connect</a></li>
 				</ul>
                 </p>
 			</div>
