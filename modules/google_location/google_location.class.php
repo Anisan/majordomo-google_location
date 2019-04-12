@@ -289,15 +289,19 @@ function usual(&$out) {
         throw new Exception('Not valid json result : ' . $result);
     }
     $result = json_decode($result, true);
-    if (!isset($result[0])) {
+    if (!isset($result[9])) {
         throw new Exception('Error json data : ' . json_encode($result));
     }
     return $result;
 }
 
-function is_json($string) {
- json_decode($string);
- return (json_last_error() == JSON_ERROR_NONE);
+private function is_json($string) {
+ json_decode($string, true);
+ if (json_last_error() != JSON_ERROR_NONE) {
+    $error = json_last_error_msg();
+    throw new \LogicException(sprintf("Failed to parse json string '%s', error: '%s'", $string, $error));
+ }
+ return true;
 }
 
 public function get_headers_from_curl_response($response) {
