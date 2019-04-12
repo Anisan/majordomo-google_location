@@ -129,6 +129,9 @@ function log($message) {
 
 function admin(&$out) {
  $this->getConfig();
+ $directory_cookies=ROOT."cms/cached/google_location/";
+ if (!file_exists($directory_cookies)) {
+    mkdir($directory_cookies, 0777, true);}
  $out['COOKIE_FILE']=$this->config['COOKIE_FILE'];
  $out['TIMEOUT_UPDATE']=$this->config['TIMEOUT_UPDATE'];
  $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
@@ -143,6 +146,23 @@ function admin(&$out) {
    $this->saveConfig();
    $this->redirect("?");
    return;
+ }
+ if($this->view_mode == 'user_delete') {
+    $this->delete_user($this->id);
+ }
+ if ($this->view_mode=='upload_cookie') {
+
+   global $file;
+   global $file_name;
+   copy($file, $directory_cookies.$file_name);
+   $this->redirect("?");
+   return;
+ } 
+ if($this->view_mode == 'delete_cookie') {
+     global $name;
+     $this->debug('delete cookie '.$name);
+     unlink($directory_cookies.$name);
+
  }
  if ($this->view_mode=='update_location') {
    $this->updateLocation();
@@ -163,7 +183,28 @@ function admin(&$out) {
  $locations = SQLSelect("select * from google_locations");
  $out['LOCATIONS'] = $locations;
  
+ $cookies_files = [];//array_diff(scandir($directory_cookies), array('..', '.'));
+ if($handle = opendir($directory_cookies)){
+    while(false !== ($file = readdir($handle))) {
+        if($file != "." && $file != "..")  {
+            $cookies_files[] = array("NAME" => $file, "DATE"=>date("F d Y H:i:s", filectime($directory_cookies.$file)), "SIZE"=>filesize($directory_cookies.$file)); 
+        }
+    }
+    closedir( $handle );
+ }
+ if ($cookies_files)
+ {
+    $this->debug($cookies_files);
+    $out['COOKIES_FILES'] = $cookies_files;
+ }
+ 
 }
+
+function delete_user($id) {
+        $rec = SQLSelectOne("SELECT * FROM google_locations WHERE ID='$id'");
+        SQLExec("DELETE FROM google_locations WHERE ID='" . $rec['ID'] . "'");
+    }
+
 /**
 * FrontEnd
 *
@@ -184,7 +225,14 @@ function usual(&$out) {
   }
  }
  public function updateLocation() {
-    $locations = $this->getLocation();
+    $locations = [];
+    $directory_cookies=ROOT."cms/cached/google_location/";
+    $cookies = array_diff(scandir($directory_cookies), array('..', '.'));
+    foreach ($cookies as $cookie)
+    {
+        $locations = array_merge($locations,$this->getLocation($directory_cookies.$cookie));
+    }
+    $this->debug($locations);
     foreach ($locations as $location) {
         $rec = SQLSelectOne("select * from google_locations where ID_USER='".$location["id"]."'");
         if ($rec['ID']) {
@@ -223,20 +271,21 @@ function usual(&$out) {
     $contents = getURLBackground($req,0); 
  }
 
- public function getLocation() {
+ public function getLocation($cookie_file) {
     try {
-		$result = $this->getLocationData();
+        $result = $this->getLocationData($cookie_file);
 	} catch (Exception $e) {
 		//$this->google_connect();
 		//$result = $this->google_callLocationUrl();
         $this->log($e);
-        return;
+        return [];
 	}
 	$return = array();
+    $path_parts = pathinfo($cookie_file);
     $return[] = array(
-			'id' => 'self_account',
-			'name' => 'Google account',
-			'fullname' => 'Google account',
+			'id' => crc32($cookie_file),
+			'name' => $path_parts['filename'],
+			'fullname' => $path_parts['filename'],
 			'image' => '',
 			'address' => $result[9][1][4],
 			'timestamp' => $result[9][1][2],
@@ -264,12 +313,11 @@ function usual(&$out) {
 	return $return;
  }
  
- public function getLocationData() {
-    $this->getConfig();
+ public function getLocationData($cookie_file) {
     $url = 'https://www.google.com/maps/preview/locationsharing/read?authuser=0&hl='.SETTINGS_SITE_LANGUAGE.'&gl='.SETTINGS_SITE_LANGUAGE.'&pb=';
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $this->config['COOKIE_FILE']);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $this->config['COOKIE_FILE']);
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 3);
     curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -283,7 +331,6 @@ function usual(&$out) {
     if (empty($info['http_code']) || $info['http_code'] != 200) {
         throw new Exception('Error connection : '. $info['http_code'] . ' => ' . json_encode($headers));
     }
-    $this->debug($result);
     $result = substr($response, $info['header_size'] + 4);
     if (!$this->is_json($result)) {
         throw new Exception('Not valid json result : ' . $result);
