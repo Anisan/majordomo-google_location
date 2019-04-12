@@ -137,8 +137,6 @@ function admin(&$out) {
  $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
  $out['DEBUG']=$this->config['DEBUG'];
  if ($this->view_mode=='update_settings') {
-   global $cookie_file;
-   $this->config['COOKIE_FILE']=$cookie_file;
    global $timeout_update;
    $this->config['TIMEOUT_UPDATE']=$timeout_update;
    global $debug;
