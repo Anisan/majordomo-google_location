@@ -266,13 +266,15 @@ function usual(&$out) {
  
  public function getLocationData() {
     $this->getConfig();
-    //$ch = curl_init('https://www.google.com/maps/preview/locationsharing/read?authuser=0&pb=');
-    $ch = curl_init('https://www.google.com/maps/preview/locationsharing/read?authuser=0&hl='.SETTINGS_SITE_LANGUAGE.'&gl='.SETTINGS_SITE_LANGUAGE.'&pb=');
+    $url = 'https://www.google.com/maps/preview/locationsharing/read?authuser=0&hl='.SETTINGS_SITE_LANGUAGE.'&gl='.SETTINGS_SITE_LANGUAGE.'&pb=';
+    $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_COOKIEJAR, $this->config['COOKIE_FILE']);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $this->config['COOKIE_FILE']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 3);
     curl_setopt($ch, CURLOPT_HEADER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     $response = curl_exec($ch);
     $info = curl_getinfo($ch);
     curl_close($ch);
@@ -281,6 +283,7 @@ function usual(&$out) {
     if (empty($info['http_code']) || $info['http_code'] != 200) {
         throw new Exception('Error connection : '. $info['http_code'] . ' => ' . json_encode($headers));
     }
+    $this->debug($result);
     $result = substr($response, $info['header_size'] + 4);
     if (!$this->is_json($result)) {
         throw new Exception('Not valid json result : ' . $result);
