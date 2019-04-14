@@ -19,12 +19,18 @@
 <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
 <div class="form-group">
  <label class="col-lg-4 control-label">Cookies:</label>
- <div class="col-lg-3">
+ <div class="col-lg-4">
  [#if COOKIES_FILES#]
     [#begin COOKIES_FILES#]
     <div class="row">
-        <label class="col-lg-9">[#NAME#] ([#SIZE#]b)</label>
+        
+        <label class="col-lg-9">
+        [#if ERROR!=''#]
+         <i class="glyphicon glyphicon-info-sign" style="color:red;" title='[#ERROR#]'></i>
+        [#endif ERROR#]
+        [#NAME#] ([#SIZE#]b)</label>
         <a class="btn btn-default" href="?view_mode=delete_cookie&name=[#NAME#]" onClick="return confirm('<#LANG_ARE_YOU_SURE#>')"><i class="glyphicon glyphicon-remove"></i></a>
+       
     </div>
     [#end COOKIES_FILES#]
  [#else COOKIES_FILES#]
@@ -68,9 +74,9 @@
 </thead>
 <tbody>
  [#begin LOCATIONS#]
- <tr>
-  <td><img src="[#IMAGE#]" height="30px" onerror="this.src='../templates/google_location/none.jpg'"></td>
-  <td valign="top">[#NAME#]</td>
+ <tr [#if WARNING=="1"#]class="danger"[#endif WARNING#]>
+  <td><img src="[#IMAGE#]" title="[#ID_USER#]" height="30px" onerror="this.src='../templates/google_location/none.jpg'"></td>
+  <td valign="top" title="[#FULLNAME#]">[#NAME#]</td>
   <td valign="top"><a onclick="var url=('https://static-maps.yandex.ru/1.x/?ll=[#LON#],[#LAT#]&size=650,450&z=17&l=map&pt=[#LON#],[#LAT#],pm2blm');
                         $.fancybox.open({'type': 'image',src: url});return false;">
                         <i class="glyphicon glyphicon-map-marker"></i> [#ADDRESS#]

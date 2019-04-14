@@ -179,13 +179,17 @@ function admin(&$out) {
     }
  }
  $locations = SQLSelect("select * from google_locations");
+ for($i=0;$i<count($locations);$i++) {
+     if (time() - strtotime($locations[$i]["LASTUPDATE"]) > 60*60)
+        $locations[$i]['WARNING'] = '1';
+ }
  $out['LOCATIONS'] = $locations;
  
  $cookies_files = [];//array_diff(scandir($directory_cookies), array('..', '.'));
  if($handle = opendir($directory_cookies)){
     while(false !== ($file = readdir($handle))) {
         if($file != "." && $file != "..")  {
-            $cookies_files[] = array("NAME" => $file, "DATE"=>date("F d Y H:i:s", filectime($directory_cookies.$file)), "SIZE"=>filesize($directory_cookies.$file)); 
+            $cookies_files[] = array("NAME" => $file, "DATE"=>date("F d Y H:i:s", filectime($directory_cookies.$file)), "SIZE"=>filesize($directory_cookies.$file), "ERROR"=>$this->config["ERROR_".$file]); 
         }
     }
     closedir( $handle );
@@ -214,7 +218,7 @@ function usual(&$out) {
  $this->admin($out);
 }
  function processSubscription($event, $details='') {
- $this->getConfig();
+  $this->getConfig();
   if ($event=='MINUTELY') {
       $timeout = $this->config['TIMEOUT_UPDATE'];
       $m=date('i',time());
@@ -255,8 +259,6 @@ function usual(&$out) {
             $rec['ID_USER'] = $location['id'];
             $rec['ID']=SQLInsert('google_locations', $rec); // adding new record
         }
-
-            
     }
     $this->config['LAST_UPDATE'] = date('Y-m-d H:i:s');
     $this->saveConfig();
@@ -270,16 +272,18 @@ function usual(&$out) {
  }
 
  public function getLocation($cookie_file) {
+    $path_parts = pathinfo($cookie_file);
     try {
         $result = $this->getLocationData($cookie_file);
 	} catch (Exception $e) {
 		//$this->google_connect();
 		//$result = $this->google_callLocationUrl();
         $this->log($e);
+        $this->config['ERROR_'.$path_parts['basename']]=$e->getMessage();
         return [];
 	}
+    $this->config['ERROR_'.$path_parts['basename']]='';
 	$return = array();
-    $path_parts = pathinfo($cookie_file);
     $return[] = array(
 			'id' => crc32($cookie_file),
 			'name' => $path_parts['filename'],
