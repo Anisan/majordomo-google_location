@@ -1,1 +1,136 @@
 <!--# Action Usual #-->
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+<script type="text/javascript" language="javascript">
+    var updateTimeOut;
+
+    function resizeMap() {
+        $('#map').css({ 'height': (($(document).height()) - 40) + 'px', 'width': '100%' });
+        return false;
+    }
+
+    function checkMarkerExists(temp_id) {
+        for (var i = 0, marker; marker = map.markers[i]; i++) {
+            if (marker.temp_id == temp_id) return true;
+        }
+        return false;
+    }
+
+    function getMarkerIndex(temp_id) {
+        for (var i = 0, marker; marker = map.markers[i]; i++) {
+            if (marker.temp_id == temp_id) return i;
+        }
+        return false;
+    }
+
+    function updateLocations() {
+        var url = "?ajax=1&op=getlocations";
+
+        $.ajax({
+            url: url
+        }).done(function (data) {
+            var obj = jQuery.parseJSON(data);
+            console.log(obj);
+            var markers = obj.LOCATIONS;
+            var markersCnt = markers.length;
+            var myCollection = new ymaps.GeoObjectCollection();    
+            for (var i = 0; i < markersCnt; i++) {
+                var marker = markers[i];
+                if (marker.SENDTOGPS != "1") break;
+                
+                var polygonLayout = ymaps.templateLayoutFactory.createClass('<div class="placemark_layout_container"><div class="polygon_layout"><img width="42" height="42" src="'+marker.IMAGE+'"></img></div></div>');
+
+                var polygonPlacemark = new ymaps.Placemark(
+                    [marker.LAT, marker.LON], 
+                    {
+                        hintContent: marker.HTML
+                    }, 
+                    {
+                        iconLayout: polygonLayout,
+                        iconShape: {   
+                            type: 'Polygon',
+                            coordinates: [
+                                [[-28,-76],[28,-76],[28,-20],[12,-20],[0,-4],[-12,-20],[-28,-20]]
+                            ]
+                        }
+                    }
+                );
+                myCollection.add(polygonPlacemark);
+            }
+            map.geoObjects.add(myCollection);
+                
+            map.setBounds(myCollection.getBounds(), {checkZoomRange:true});
+            //updateTimeOut = setTimeout('legendUpdate();', 5000);
+        });
+        return false;
+    }
+
+    var map;
+    var startLat = 58.5795;
+    var startLon = 49.6888;
+    // HTML5 геолокация
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            startLat = position.coords.latitude;
+            startLon = position.coords.longitude;
+        }, function () {
+            // ошибка геолокации
+        });
+    } else { /* Браузер не поддерживает геолокацию */ }
+
+    $(document).ready(function () {
+        ymaps.ready(function () {
+            map = new ymaps.Map('map', {
+                center: [startLat, startLon],
+                zoom: 17,
+                type: 'yandex#map'
+            });
+            legendUpdate();
+            resizeMap();
+        });
+    });
+
+    function legendUpdate() {
+        map.geoObjects.removeAll();
+        updateLocations();
+        return false;
+    }
+</script>
+
+<style>
+        /* Макет метки с "хвостиком" */
+        .polygon_layout {
+            position: relative;
+            background: #ffffff;
+            border: 4px solid #225D9C;
+            width: 50px; 
+            height: 50px;
+            position: absolute;
+            left: -28px;
+            top: -76px;
+            color: #225D9C;
+        }
+        
+        .polygon_layout:after, .polygon_layout:before {
+            top: 100%;
+            left: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+        }
+        
+        .polygon_layout:after {
+            border-top-color: #225D9C;
+            border-width: 10px;
+            margin-left: -10px;
+        }
+        
+        .polygon_layout:before {
+            border-top-color: #225D9C;
+            border-width: 16px;
+            margin-left: -16px;
+        }
+</style>
+<div id="map" style="width: 100%; height: 100%;"></div>

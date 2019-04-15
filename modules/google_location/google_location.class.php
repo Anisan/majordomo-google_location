@@ -215,7 +215,29 @@ function delete_user($id) {
 * @access public
 */
 function usual(&$out) {
- $this->admin($out);
+    global $ajax;
+    global $op;
+    if ($ajax) {
+        if (!headers_sent()) {
+            header ("HTTP/1.0: 200 OK\n");
+            header ('Content-Type: text/html; charset=utf-8');
+        }
+        
+        if ($op=='getlocations') {
+            $data=array();
+            $markers=SQLSelect("SELECT * FROM google_locations");
+            $total=count($markers);
+            for($i=0;$i<$total;$i++) {
+                $markers[$i]['HTML']="<b>".$markers[$i]['NAME']."</b></br>";
+                $markers[$i]['HTML'].="Last update:".$markers[$i]['LASTUPDATE']."</br>";
+                $markers[$i]['HTML'].="Battery:".$markers[$i]['BATTLEVEL']."%";
+                $data['LOCATIONS'][]=$markers[$i];
+            }
+            echo json_encode($data);
+        }
+        
+        exit;
+    }
 }
  function processSubscription($event, $details='') {
   $this->getConfig();

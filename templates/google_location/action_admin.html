@@ -75,7 +75,7 @@
 <tbody>
  [#begin LOCATIONS#]
  <tr [#if WARNING=="1"#]class="danger"[#endif WARNING#]>
-  <td><img src="[#IMAGE#]" title="[#ID_USER#]" height="30px" onerror="this.src='../templates/google_location/none.jpg'"></td>
+  <td><img src="[#IMAGE#]" title="[#ID_USER#]" height="30px" onerror="this.src='/templates/google_location/none.jpg'"></td>
   <td valign="top" title="[#FULLNAME#]">[#NAME#]</td>
   <td valign="top"><a onclick="var url=('https://static-maps.yandex.ru/1.x/?ll=[#LON#],[#LAT#]&size=650,450&z=17&l=map&pt=[#LON#],[#LAT#],pm2blm');
                         $.fancybox.open({'type': 'image',src: url});return false;">
