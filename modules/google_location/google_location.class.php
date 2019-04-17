@@ -132,7 +132,6 @@ function admin(&$out) {
  $directory_cookies=ROOT."cms/cached/google_location/";
  if (!file_exists($directory_cookies)) {
     mkdir($directory_cookies, 0777, true);}
- $out['COOKIE_FILE']=$this->config['COOKIE_FILE'];
  $out['TIMEOUT_UPDATE']=$this->config['TIMEOUT_UPDATE'];
  $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
  $out['DEBUG']=$this->config['DEBUG'];
@@ -145,8 +144,13 @@ function admin(&$out) {
    $this->redirect("?");
    return;
  }
+ if($this->view_mode == 'user_edit') {
+  $this->edit_user($out, $this->id);
+ }
  if($this->view_mode == 'user_delete') {
     $this->delete_user($this->id);
+   $this->redirect("?");
+   return;
  }
  if ($this->view_mode=='upload_cookie') {
 
@@ -160,7 +164,8 @@ function admin(&$out) {
      global $name;
      $this->debug('delete cookie '.$name);
      unlink($directory_cookies.$name);
-
+   $this->redirect("?");
+   return;
  }
  if ($this->view_mode=='update_location') {
    $this->updateLocation();
@@ -177,6 +182,8 @@ function admin(&$out) {
             $rec['SENDTOGPS']=1;
         SQLUpdate('google_locations', $rec); // update
     }
+    $this->redirect("?");
+    return;
  }
  $locations = SQLSelect("select * from google_locations");
  for($i=0;$i<count($locations);$i++) {
@@ -189,7 +196,7 @@ function admin(&$out) {
  if($handle = opendir($directory_cookies)){
     while(false !== ($file = readdir($handle))) {
         if($file != "." && $file != "..")  {
-            $cookies_files[] = array("NAME" => $file, "DATE"=>date("F d Y H:i:s", filectime($directory_cookies.$file)), "SIZE"=>filesize($directory_cookies.$file), "ERROR"=>$this->config["ERROR_".$file]); 
+            $cookies_files[] = array("NAME" => $file, "DATE"=>date("F d Y H:i:s", filectime($directory_cookies.$file)), "SIZE"=>$this->sizeFilter(filesize($directory_cookies.$file)), "ERROR"=>$this->config["ERROR_".$file]); 
         }
     }
     closedir( $handle );
@@ -201,11 +208,20 @@ function admin(&$out) {
  }
  
 }
+public function sizeFilter( $bytes )
+{
+    $label = array( 'B', 'KB', 'MB', 'GB', 'TB', 'PB' );
+    for( $i = 0; $bytes >= 1024 && $i < ( count( $label ) -1 ); $bytes /= 1024, $i++ );
+    return( round( $bytes, 2 ) . " " . $label[$i] );
+}
 
+function edit_user(&$out, $id) {
+    require(DIR_MODULES . $this->name . '/user_edit.inc.php');
+}
 function delete_user($id) {
-        $rec = SQLSelectOne("SELECT * FROM google_locations WHERE ID='$id'");
-        SQLExec("DELETE FROM google_locations WHERE ID='" . $rec['ID'] . "'");
-    }
+    $rec = SQLSelectOne("SELECT * FROM google_locations WHERE ID='$id'");
+    SQLExec("DELETE FROM google_locations WHERE ID='" . $rec['ID'] . "'");
+}
 
 /**
 * FrontEnd
@@ -228,9 +244,12 @@ function usual(&$out) {
             $markers=SQLSelect("SELECT * FROM google_locations");
             $total=count($markers);
             for($i=0;$i<$total;$i++) {
-                $markers[$i]['HTML']="<b>".$markers[$i]['NAME']."</b></br>";
-                $markers[$i]['HTML'].="Last update:".$markers[$i]['LASTUPDATE']."</br>";
-                $markers[$i]['HTML'].="Battery:".$markers[$i]['BATTLEVEL']."%";
+                $markers[$i]['HTML']="<b>".$markers[$i]['FULLNAME']."</b></br>";
+                $markers[$i]['HTML'].=LANG_LATEST_UPDATES.": ".$markers[$i]['LASTUPDATE']."</br>";
+                $markers[$i]['HTML'].=LANG_BATTERY_LEVEL.": ";
+                if ($markers[$i]['CHARGING']==1)
+                    $markers[$i]['HTML'].="<i class='glyphicon glyphicon-flash'> </i>";
+                $markers[$i]['HTML'].=$markers[$i]['BATTLEVEL']."%";
                 $data['LOCATIONS'][]=$markers[$i];
             }
             echo json_encode($data);
@@ -265,9 +284,6 @@ function usual(&$out) {
                 $this->sendToGps($location);
             }
         }
-        $rec['NAME'] = $location['name'];
-        $rec['FULLNAME'] = $location['fullname'];
-        $rec['IMAGE'] = $location['image'];
         $rec['LASTUPDATE'] = date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000));
         $rec['ADDRESS'] = $location['address'];
         $rec['LAT'] = $location['lat'];
@@ -279,6 +295,9 @@ function usual(&$out) {
             SQLUpdate('google_locations', $rec); // update
         } else {
             $rec['ID_USER'] = $location['id'];
+            $rec['NAME'] = $location['name'];
+            $rec['FULLNAME'] = $location['fullname'];
+            $rec['IMAGE'] = $location['image'];
             $rec['ID']=SQLInsert('google_locations', $rec); // adding new record
         }
     }

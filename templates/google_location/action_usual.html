@@ -36,7 +36,7 @@
             var myCollection = new ymaps.GeoObjectCollection();    
             for (var i = 0; i < markersCnt; i++) {
                 var marker = markers[i];
-                if (marker.SENDTOGPS != "1") break;
+                if (marker.SENDTOGPS != "1") continue;
                 
                 var polygonLayout = ymaps.templateLayoutFactory.createClass('<div class="placemark_layout_container"><div class="polygon_layout"><img width="42" height="42" src="'+marker.IMAGE+'"></img></div></div>');
 
