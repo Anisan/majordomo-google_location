@@ -340,7 +340,7 @@ function usual(&$out) {
 			'accuracy' => $result[9][1][3],
 		);
     }
-	if (isset($result[9]))
+	if (isset($result[0]))
     {
       $result = $result[0];
       foreach ($result as $user) {
@@ -385,11 +385,11 @@ function usual(&$out) {
     if (!$this->is_json($result)) {
         throw new Exception('Not valid json result : ' . $result);
     }
+    $this->debug($result);
     $result = json_decode($result, true);
     if (!isset($result[9]) && !isset($result[0])) {
         throw new Exception('Error json data : ' . json_encode($result));
     }
-    $this->debug($result);
     return $result;
 }
 
