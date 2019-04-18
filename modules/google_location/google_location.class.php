@@ -278,6 +278,8 @@ function usual(&$out) {
     $this->debug($locations);
     foreach ($locations as $location) {
         $rec = SQLSelectOne("select * from google_locations where ID_USER='".$location["id"]."'");
+        if ($location['lat'] == 0 && $location['lon'] == 0)
+            continue;
         if ($rec['ID']) {
             if ($rec['LASTUPDATE'] != date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000)) && $rec["SENDTOGPS"]==1)
             {
@@ -308,7 +310,9 @@ function usual(&$out) {
  public function sendToGps($location)
  {
     $req = BASE_URL."/gps.php?latitude=".$location['lat']."&longitude=".$location['lon']."&deviceid=".$location['id'].
-    "&provider=google_location&battlevel=".$location['battery']."&charging=".$location['charging']."&accuracy=".$location['accuracy'];
+    "&provider=google_location&accuracy=".$location['accuracy'];
+    if($location['battery']>0){
+        $req .= "&battlevel=".$location['battery']."&charging=".$location['charging'];}
     $contents = getURLBackground($req,0); 
  }
 
@@ -317,8 +321,6 @@ function usual(&$out) {
     try {
         $result = $this->getLocationData($cookie_file);
 	} catch (Exception $e) {
-		//$this->google_connect();
-		//$result = $this->google_callLocationUrl();
         $this->log($e);
         $this->config['ERROR_'.$path_parts['basename']]=$e->getMessage();
         return [];
