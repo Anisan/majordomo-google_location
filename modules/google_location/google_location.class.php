@@ -275,7 +275,6 @@ function usual(&$out) {
     {
         $locations = array_merge($locations,$this->getLocation($directory_cookies.$cookie));
     }
-    $this->debug($locations);
     foreach ($locations as $location) {
         $rec = SQLSelectOne("select * from google_locations where ID_USER='".$location["id"]."'");
         if ($location['lat'] == 0 && $location['lon'] == 0)
@@ -387,9 +386,10 @@ function usual(&$out) {
         throw new Exception('Not valid json result : ' . $result);
     }
     $result = json_decode($result, true);
-    if (!(isset($result[9]) || isset($result[0]))) {
+    if (!isset($result[9]) && !isset($result[0])) {
         throw new Exception('Error json data : ' . json_encode($result));
     }
+    $this->debug($result);
     return $result;
 }
 
