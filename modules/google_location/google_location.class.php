@@ -327,7 +327,9 @@ function usual(&$out) {
 	}
     $this->config['ERROR_'.$path_parts['basename']]='';
 	$return = array();
-    $return[] = array(
+    if (isset($result[9]))
+    {
+        $return[] = array(
 			'id' => crc32($cookie_file),
 			'name' => $path_parts['filename'],
 			'fullname' => $path_parts['filename'],
@@ -338,8 +340,11 @@ function usual(&$out) {
             'lon' => $result[9][1][1][1],
 			'accuracy' => $result[9][1][3],
 		);
-	$result = $result[0];
-	foreach ($result as $user) {
+    }
+	if (isset($result[9]))
+    {
+      $result = $result[0];
+      foreach ($result as $user) {
 		$return[] = array(
 			'id' => $user[6][0],
 			'name' => $user[6][3],
@@ -353,7 +358,8 @@ function usual(&$out) {
 			'battery' => $user[13][1],
             'charging' => $user[13][0],
 		);
-	}
+	  }
+    }
     $this->debug($return);
 	return $return;
  }
@@ -381,7 +387,7 @@ function usual(&$out) {
         throw new Exception('Not valid json result : ' . $result);
     }
     $result = json_decode($result, true);
-    if (!isset($result[9])) {
+    if (!(isset($result[9]) || isset($result[0]))) {
         throw new Exception('Error json data : ' . json_encode($result));
     }
     return $result;
