@@ -309,7 +309,7 @@ function usual(&$out) {
  public function sendToGps($location)
  {
     $req = BASE_URL."/gps.php?latitude=".$location['lat']."&longitude=".$location['lon']."&deviceid=".$location['id'].
-    "&provider=google_location&accuracy=".$location['accuracy'];
+    "&provider=google_location&accuracy=".$location['accuracy']."&address=".urlencode($location['address']);
     if($location['battery']>0){
         $req .= "&battlevel=".$location['battery']."&charging=".$location['charging'];}
     $contents = getURLBackground($req,0); 
