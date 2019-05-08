@@ -134,6 +134,8 @@ function admin(&$out) {
     mkdir($directory_cookies, 0777, true);}
  $out['TIMEOUT_UPDATE']=$this->config['TIMEOUT_UPDATE'];
  $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
+ if ($out['LAST_UPDATE'] == '')
+     $out['LAST_UPDATE'] == 1;
  $out['DEBUG']=$this->config['DEBUG'];
  if ($this->view_mode=='update_settings') {
    global $timeout_update;
@@ -262,6 +264,8 @@ function usual(&$out) {
   $this->getConfig();
   if ($event=='MINUTELY') {
       $timeout = $this->config['TIMEOUT_UPDATE'];
+      if ($timeout == '0') return;
+      if ($timeout == '') $timeout = 1;
       $m=date('i',time());
       if ($m % $timeout == 0)
         $this->updateLocation();
@@ -338,6 +342,8 @@ function usual(&$out) {
 			'lat' => $result[9][1][1][2],
             'lon' => $result[9][1][1][1],
 			'accuracy' => $result[9][1][3],
+            'battery' => 0,
+            'charging' => 0,
 		);
     }
 	if (isset($result[0]))

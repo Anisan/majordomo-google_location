@@ -1,7 +1,7 @@
 [#if VIEW_MODE=""#]
 <div>
  <a class="btn btn-default" href="#api_settings" data-toggle="collapse"><i class="glyphicon glyphicon-cog"></i> <#LANG_SETUP#></a>
- 	<button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#about"><#LANG_GL_ABOUT#>&nbsp;&nbsp;<span class="glyphicon glyphicon-info-sign icon-white"></span>
+ <button class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#about"><#LANG_GL_ABOUT#>&nbsp;&nbsp;<span class="glyphicon glyphicon-info-sign icon-white"></span>
 	</button>
     </div>
 <div class="collapse" id='api_settings'>&nbsp;
@@ -12,6 +12,7 @@
     <label class="col-lg-4 control-label"><#LANG_GL_COOKIES#></label>
     <div class="col-lg-3"><input class="form-control" type="file" name="file" class="input"></div>
     <a href='#' onclick='document.forms["cookies_form"].submit(); return false;' title="<#LANG_ADD#>" class="btn btn-default"><i class='glyphicon glyphicon-plus'></i></a>
+    <button class="btn btn-default" data-toggle="modal" data-target="#help"><i class="glyphicon glyphicon-question-sign"></i></button>
   </div>
   <input type="hidden" name="view_mode" value="upload_cookie">
 </form>
@@ -44,7 +45,7 @@
 <div class="form-group">
  <label class="col-lg-4 control-label"><#LANG_GL_SETTING_TIMEOUT#>
  </label>
- <div class="col-lg-3"><input class="form-control" type="text" name="timeout_update" value="<#TIMEOUT_UPDATE#>" class="input"></div>
+ <div class="col-lg-3"><input class="form-control" type="number" min=0 max=60 step=1 name="timeout_update" value="<#TIMEOUT_UPDATE#>" class="input"></div>
 </div>
 <div class="form-group">
  <label class="control-label"><#LANG_GL_DEBUG#></label>
@@ -134,6 +135,29 @@
 			
 			<div class="modal-footer">
 				<div class="pull-left">Telegram: <a href="https://telegram.me/Eraser1981" target="_blank">@Eraser1981</a> :)</div>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="help" tabindex="-1" role="dialog" aria-labelledby="help1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title">Google location</h4>
+			</div>
+			<div class="modal-body">
+                <p><b>Как получить файл с cookies</b><br>
+                <ul>
+                    <li>Зайти на <a href='https://myaccount.google.com/?utm_source=OGB&tab=lk&utm_medium=app' target="_blank">страницу Google Account</a></li>
+                    <li>Авторизоваться там, если не авторизовались</li>
+                    <li>Сохранить файл с помощью приложения для Chrome <a href='https://chrome.google.com/webstore/detail/cookiestxt/njabckikapfpffapmjgojcnbfjonfjfg?hl=ru' target="_blank">cookies.txt</a></li>
+                </ul>
+                </p>
+
+			</div>
+			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			</div>
 		</div>
