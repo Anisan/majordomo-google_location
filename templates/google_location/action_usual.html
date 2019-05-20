@@ -31,6 +31,8 @@
         }).done(function (data) {
             var obj = jQuery.parseJSON(data);
             console.log(obj);
+            var now = new Date();
+            var timeOnline = new Date(now.getTime() - 60*60000);
             var markers = obj.LOCATIONS;
             var markersCnt = markers.length;
             var myCollection = new ymaps.GeoObjectCollection();    
@@ -38,7 +40,11 @@
                 var marker = markers[i];
                 if (marker.SENDTOGPS != "1") continue;
                 
-                var polygonLayout = ymaps.templateLayoutFactory.createClass('<div class="placemark_layout_container"><div class="polygon_layout"><img width="42" height="42" src="'+marker.IMAGE+'"></img></div></div>');
+                var online = 'online';
+                var lastUpdate = new Date(marker.LASTUPDATE);
+                if (lastUpdate < timeOnline)
+                    online ="offline";
+                var polygonLayout = ymaps.templateLayoutFactory.createClass('<div class="placemark_layout_container"><div class="polygon_layout_'+online+'"><img width="42" height="42" src="'+marker.IMAGE+'"></img></div></div>');
 
                 var polygonPlacemark = new ymaps.Placemark(
                     [marker.LAT, marker.LON], 
@@ -64,7 +70,7 @@
         });
         return false;
     }
-
+    
     var map;
     var startLat = 58.5795;
     var startLon = 49.6888;
@@ -99,19 +105,19 @@
 
 <style>
         /* Макет метки с "хвостиком" */
-        .polygon_layout {
+        .polygon_layout_online {
             position: relative;
             background: #ffffff;
-            border: 4px solid #225D9C;
+            border: 4px solid green;
             width: 50px; 
             height: 50px;
             position: absolute;
             left: -28px;
             top: -76px;
-            color: #225D9C;
+            color: green;
         }
         
-        .polygon_layout:after, .polygon_layout:before {
+        .polygon_layout_online:after, .polygon_layout:before {
             top: 100%;
             left: 50%;
             border: solid transparent;
@@ -121,14 +127,47 @@
             position: absolute;
         }
         
-        .polygon_layout:after {
-            border-top-color: #225D9C;
+        .polygon_layout_online:after {
+            border-top-color: green;
             border-width: 10px;
             margin-left: -10px;
         }
         
-        .polygon_layout:before {
-            border-top-color: #225D9C;
+        .polygon_layout_online:before {
+            border-top-color: green;
+            border-width: 16px;
+            margin-left: -16px;
+        }
+        .polygon_layout_offline {
+            position: relative;
+            background: #ffffff;
+            border: 4px solid red;
+            width: 50px; 
+            height: 50px;
+            position: absolute;
+            left: -28px;
+            top: -76px;
+            color: red;
+        }
+        
+        .polygon_layout_offline:after, .polygon_layout:before {
+            top: 100%;
+            left: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+        }
+        
+        .polygon_layout_offline:after {
+            border-top-color: red;
+            border-width: 10px;
+            margin-left: -10px;
+        }
+        
+        .polygon_layout_offline:before {
+            border-top-color: red;
             border-width: 16px;
             margin-left: -16px;
         }
