@@ -294,7 +294,8 @@ function usual(&$out) {
         $rec['LAT'] = $location['lat'];
         $rec['LON'] = $location['lon'];
         $rec['ACCURACY'] = $location['accuracy'];
-        $rec['BATTLEVEL'] = $location['battery'];
+        if ($location['battery']!=NULL)
+            $rec['BATTLEVEL'] = $location['battery'];
         $rec['CHARGING'] = $location['charging'];
         if ($rec['ID']) {
             SQLUpdate('google_locations', $rec); // update
