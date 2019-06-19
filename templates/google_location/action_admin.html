@@ -70,6 +70,7 @@
   <td><b><#LANG_NAME#></b></td>
   <td><b><#LANG_LOCATION#></b></td>
   <td><b><#LANG_ACCURACY#></b></td>
+  <td><b><#LANG_SPEED#></b></td>
   <td><b><#LANG_LATEST_UPDATES#></b></td>
   <td><b><#LANG_BATTERY_LEVEL#></b></td>
   <td><b><#LANG_GL_SENDTOGPS#></b></td>
@@ -79,13 +80,14 @@
 <tbody>
  [#begin LOCATIONS#]
  <tr [#if WARNING=="1"#]class="danger"[#endif WARNING#]>
-  <td><img src="[#IMAGE#]" title="[#ID_USER#]" height="30px" onerror="this.src='/templates/google_location/none.jpg'"></td>
+  <td><img src="[#IMAGE#]" style="border-radius: 0 50% 50%;" title="[#ID_USER#]" height="30px" onerror="this.src='/templates/google_location/none.jpg'"></td>
   <td title="[#FULLNAME#]">[#NAME#]</td>
   <td><a onclick="var url=('https://static-maps.yandex.ru/1.x/?ll=[#LON#],[#LAT#]&size=650,450&z=17&l=map&pt=[#LON#],[#LAT#],pm2blm');
                         $.fancybox.open({'type': 'image',src: url});return false;">
                         <i class="glyphicon glyphicon-map-marker"></i> [#ADDRESS#]
                     </a></td>
   <td>[#ACCURACY#]</td>
+  <td>[#SPEED#]</td>
   <td>[#LASTUPDATE#]</td>
   <td>[#if CHARGING=="1"#]<i class="glyphicon glyphicon-flash"> </i>[#endif CHARGING#][#BATTLEVEL#]%</td>
   <td>[#if SENDTOGPS=="1"#]
@@ -113,7 +115,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-				<h4 class="modal-title">Google location v0.8.1</h4>
+				<h4 class="modal-title">Google location v0.9</h4>
 			</div>
 			<div class="modal-body">
 				<div class="float-right">

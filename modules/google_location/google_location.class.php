@@ -286,6 +286,8 @@ function usual(&$out) {
         if ($rec['ID']) {
             if ($rec['LASTUPDATE'] != date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000)) && $rec["SENDTOGPS"]==1)
             {
+                $location['speed'] = $this->getSpeed($rec, $location);
+                $rec['SPEED'] = $location['speed'];
                 $this->sendToGps($location);
             }
         }
@@ -310,13 +312,58 @@ function usual(&$out) {
     $this->config['LAST_UPDATE'] = date('Y-m-d H:i:s');
     $this->saveConfig();
  }
- 
+ public function getSpeed($last,$new)
+ {
+     $time_last = strtotime($last['LASTUPDATE']);
+     $time_new = (int)($new['timestamp']/1000);
+     $dist = $this->calculateTheDistance($last['LAT'],$last['LON'],$new['lat'],$new['lon']);
+     $diff = $time_new - $time_last;
+     return round($dist / $diff * 3.6 , 2); // km/h
+;
+ }
+  /**
+  * Calculate distance between two GPS coordinates
+  * @param mixed $latA First coord latitude
+  * @param mixed $lonA First coord longitude
+  * @param mixed $latB Second coord latitude
+  * @param mixed $lonB Second coord longitude
+  * @return double
+  */
+ function calculateTheDistance($latA, $lonA, $latB, $lonB)
+ {
+   define('EARTH_RADIUS', 6372795);
+   
+   $lat1  = $latA * M_PI / 180;
+   $lat2  = $latB * M_PI / 180;
+   $long1 = $lonA * M_PI / 180;
+   $long2 = $lonB * M_PI / 180;
+
+   $cl1 = cos($lat1);
+   $cl2 = cos($lat2);
+   $sl1 = sin($lat1);
+   $sl2 = sin($lat2);
+
+   $delta  = $long2 - $long1;
+   $cdelta = cos($delta);
+   $sdelta = sin($delta);
+
+   $y = sqrt(pow($cl2 * $sdelta, 2) + pow($cl1 * $sl2 - $sl1 * $cl2 * $cdelta, 2));
+   $x = $sl1 * $sl2 + $cl1 * $cl2 * $cdelta;
+
+   $ad = atan2($y, $x);
+   
+   $dist = round($ad * EARTH_RADIUS);
+
+   return $dist;
+ }
+
  public function sendToGps($location)
  {
     $req = BASE_URL."/gps.php?latitude=".$location['lat']."&longitude=".$location['lon']."&deviceid=".$location['id'].
     "&provider=google_location&accuracy=".$location['accuracy']."&address=".urlencode($location['address']);
     if($location['battery']>0){
         $req .= "&battlevel=".$location['battery']."&charging=".$location['charging'];}
+    $req .= "&speed=".$location['speed'];
     $contents = getURLBackground($req,0); 
  }
 
@@ -463,6 +510,7 @@ function dbInstall($data) {
  google_locations: LAT float DEFAULT '0' NOT NULL
  google_locations: LON float DEFAULT '0' NOT NULL
  google_locations: ACCURACY float DEFAULT '0' NOT NULL
+ google_locations: SPEED float DEFAULT '0' NOT NULL
  google_locations: BATTLEVEL int(3) NOT NULL DEFAULT '0'
  google_locations: CHARGING int(3) NOT NULL DEFAULT '0'
  google_locations: SENDTOGPS int(3) NOT NULL DEFAULT '0'
