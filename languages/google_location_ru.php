@@ -8,6 +8,7 @@ $dictionary=array(
 "GL_ABOUT" => "О модуле",
 "GL_COOKIES" => "Файлы cookies",
 "GL_SETTING_TIMEOUT" => "Период обновления (мин)",
+"GL_LIMIT_SPEED" => "Минимальная фиксируемая скорость",
 "GL_DEBUG" => "Подробное логирование",
 "GL_SENDTOGPS" => "Отправка в GPS tracker",
 "GL_FULLNAME" => "Полное имя",

@@ -136,10 +136,13 @@ function admin(&$out) {
  $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
  if ($out['LAST_UPDATE'] == '')
      $out['LAST_UPDATE'] == 1;
+ $out['LIMIT_SPEED']=$this->config['LIMIT_SPEED'];
  $out['DEBUG']=$this->config['DEBUG'];
  if ($this->view_mode=='update_settings') {
    global $timeout_update;
    $this->config['TIMEOUT_UPDATE']=$timeout_update;
+   global $limit_speed;
+   $this->config['LIMIT_SPEED']=$limit_speed;
    global $debug;
    $this->config['DEBUG']=$debug;
    $this->saveConfig();
@@ -287,6 +290,8 @@ function usual(&$out) {
             if ($rec['LASTUPDATE'] != date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000)) && $rec["SENDTOGPS"]==1)
             {
                 $location['speed'] = $this->getSpeed($rec, $location);
+                if ($this->config['LIMIT_SPEED'] > $location['speed'])
+                    $location['speed'] = 0;
                 $rec['SPEED'] = $location['speed'];
                 $this->sendToGps($location);
             }

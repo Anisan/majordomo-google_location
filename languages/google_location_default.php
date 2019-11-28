@@ -8,6 +8,7 @@ $dictionary=array(
 "GL_ABOUT" => "About",
 "GL_COOKIES" => "Cookies",
 "GL_SETTING_TIMEOUT" => "Timeout update (min)",
+"GL_LIMIT_SPEED" => "Min limit speed",
 "GL_DEBUG" => "Debug",
 "GL_SENDTOGPS" => "Send to GPS module",
 "GL_FULLNAME" => "Fullname",

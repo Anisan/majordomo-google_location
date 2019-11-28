@@ -48,6 +48,10 @@
  <div class="col-lg-3"><input class="form-control" type="number" min=0 max=60 step=1 name="timeout_update" value="<#TIMEOUT_UPDATE#>" class="input"></div>
 </div>
 <div class="form-group">
+ <label class="col-lg-4 control-label"><#LANG_GL_LIMIT_SPEED#></label>
+ <div class="col-lg-3"><input class="form-control input" type="number" min=0 max=5 step=0.1 name="limit_speed" value="<#LIMIT_SPEED#>"></div>
+</div>
+<div class="form-group">
  <label class="control-label"><#LANG_GL_DEBUG#></label>
  <div class="controls"><input type="checkbox" name="debug" value="1"[#if DEBUG="1"#] checked[#endif#]></div>
 </div>
@@ -115,7 +119,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-				<h4 class="modal-title">Google location v0.9</h4>
+				<h4 class="modal-title">Google location v0.10</h4>
 			</div>
 			<div class="modal-body">
 				<div class="float-right">
