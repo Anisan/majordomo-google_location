@@ -9,7 +9,7 @@
 <fieldset>
 <form name="cookies_form" method="POST" action="?" enctype="multipart/form-data" class="form-horizontal">
   <div class="form-group">
-    <label class="col-lg-4 control-label"><#LANG_GL_COOKIES#></label>
+    <label class="col-lg-7 control-label"><#LANG_GL_COOKIES#></label>
     <div class="col-lg-3"><input class="form-control" type="file" name="file" class="input"></div>
     <a href='#' onclick='document.forms["cookies_form"].submit(); return false;' title="<#LANG_ADD#>" class="btn btn-default"><i class='glyphicon glyphicon-plus'></i></a>
     <button class="btn btn-default" data-toggle="modal" data-target="#help"><i class="glyphicon glyphicon-question-sign"></i></button>
@@ -20,7 +20,7 @@
 [#if COOKIES_FILES#]
 [#begin COOKIES_FILES#]
 <div class="form-group">
- <label class="col-lg-4 control-label"></label>
+ <label class="col-lg-5 control-label"></label>
  <div class="col-lg-3">
       <div class="col-lg-8">
         <p class="form-control-static">
@@ -36,23 +36,27 @@
 [#end COOKIES_FILES#]
 [#else COOKIES_FILES#]
 <div class="form-group">
- <label class="col-lg-4 control-label"></label>
+ <label class="col-lg-5 control-label"></label>
  <div class="col-lg-3">
     <div class="alert alert-danger"><#LANG_NO_RECORDS_FOUND#></div>
  </div>
 </div>
 [#endif COOKIES_FILES#]
 <div class="form-group">
- <label class="col-lg-4 control-label"><#LANG_GL_SETTING_TIMEOUT#>
+ <label class="col-lg-5 control-label"><#LANG_GL_SETTING_TIMEOUT#>
  </label>
- <div class="col-lg-3"><input class="form-control" type="number" min=0 max=60 step=1 name="timeout_update" value="<#TIMEOUT_UPDATE#>" class="input"></div>
+ <div class="col-lg-1"><input class="form-control" type="number" min=0 max=60 step=1 name="timeout_update" value="<#TIMEOUT_UPDATE#>" class="input"></div>
 </div>
 <div class="form-group">
- <label class="col-lg-4 control-label"><#LANG_GL_LIMIT_SPEED#></label>
- <div class="col-lg-3"><input class="form-control input" type="number" min=0 max=5 step=0.1 name="limit_speed" value="<#LIMIT_SPEED#>"></div>
+ <label class="col-lg-5 control-label"><#LANG_GL_LIMIT_SPEED_MIN#></label>
+ <div class="col-lg-1"><input class="form-control input" type="number" min=0 max=10 step=0.1 name="min_limit_speed" value="<#MIN_LIMIT_SPEED#>"></div>
 </div>
 <div class="form-group">
- <label class="control-label"><#LANG_GL_DEBUG#></label>
+ <label class="col-lg-5 control-label"><#LANG_GL_LIMIT_SPEED_MAX#></label>
+ <div class="col-lg-1"><input class="form-control input" type="number" min=0 step=1 name="max_limit_speed" value="<#MAX_LIMIT_SPEED#>"></div>
+</div>
+<div class="form-group">
+ <label class="col-lg-5 control-label"><#LANG_GL_DEBUG#></label>
  <div class="controls"><input type="checkbox" name="debug" value="1"[#if DEBUG="1"#] checked[#endif#]></div>
 </div>
 <div class="form-actions">

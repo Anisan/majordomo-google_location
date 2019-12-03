@@ -118,12 +118,7 @@ function debug($content) {
 function log($message) {
     //echo $message . "\n";
     // DEBUG MESSAGE LOG
-    if(!is_dir(ROOT . 'debmes')) {
-        mkdir(ROOT . 'debmes', 0777);
-    }
-    $today_file = ROOT . 'cms/debmes/log_' . date('Y-m-d') . '-google_location.php.txt';
-    $data = date("H:i:s")." " . $message . "\n";
-    file_put_contents($today_file, $data, FILE_APPEND | LOCK_EX);
+    DebMes($message, 'google_location'); 
 }
     
 
@@ -132,23 +127,33 @@ function admin(&$out) {
  $directory_cookies=ROOT."cms/cached/google_location/";
  if (!file_exists($directory_cookies)) {
     mkdir($directory_cookies, 0777, true);}
- $out['TIMEOUT_UPDATE']=$this->config['TIMEOUT_UPDATE'];
- $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
- if ($out['LAST_UPDATE'] == '')
-     $out['LAST_UPDATE'] == 1;
- $out['LIMIT_SPEED']=$this->config['LIMIT_SPEED'];
- $out['DEBUG']=$this->config['DEBUG'];
  if ($this->view_mode=='update_settings') {
    global $timeout_update;
    $this->config['TIMEOUT_UPDATE']=$timeout_update;
-   global $limit_speed;
-   $this->config['LIMIT_SPEED']=$limit_speed;
+   global $min_limit_speed;
+   $this->config['MIN_LIMIT_SPEED']=$min_limit_speed;
+   global $max_limit_speed;
+   $this->config['MAX_LIMIT_SPEED']=$max_limit_speed;
    global $debug;
    $this->config['DEBUG']=$debug;
+   if ($this->config['TIMEOUT_UPDATE'] == '')  $this->config['TIMEOUT_UPDATE'] = 1;
+   if ($this->config['MIN_LIMIT_SPEED'] == '')  $this->config['MIN_LIMIT_SPEED'] = 0;
+   if ($this->config['MAX_LIMIT_SPEED'] == '')  $this->config['MAX_LIMIT_SPEED'] = 200;
    $this->saveConfig();
    $this->redirect("?");
    return;
  }
+ $out['TIMEOUT_UPDATE']=$this->config['TIMEOUT_UPDATE'];
+ $out['LAST_UPDATE']=$this->config['LAST_UPDATE'];
+ $out['MIN_LIMIT_SPEED']=$this->config['MIN_LIMIT_SPEED'];
+ $out['MAX_LIMIT_SPEED']=$this->config['MAX_LIMIT_SPEED'];
+ if ($out['LAST_UPDATE'] == '')
+     $out['LAST_UPDATE'] = 1;
+ if ($out['MIN_LIMIT_SPEED'] == '')
+     $out['MIN_LIMIT_SPEED'] = 0;
+ if ($out['MAX_LIMIT_SPEED'] == '')
+     $out['MAX_LIMIT_SPEED'] = 200;
+ $out['DEBUG']=$this->config['DEBUG'];
  if($this->view_mode == 'user_edit') {
   $this->edit_user($out, $this->id);
  }
@@ -286,16 +291,19 @@ function usual(&$out) {
         $rec = SQLSelectOne("select * from google_locations where ID_USER='".$location["id"]."'");
         if ($location['lat'] == 0 && $location['lon'] == 0)
             continue;
+        
         if ($rec['ID']) {
             if ($rec['LASTUPDATE'] != date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000)) && $rec["SENDTOGPS"]==1)
             {
                 $location['speed'] = $this->getSpeed($rec, $location);
-                if ($this->config['LIMIT_SPEED'] > $location['speed'])
+                if ($this->config['MIN_LIMIT_SPEED'] > $location['speed'])
                     $location['speed'] = 0;
+                if ($this->config['MAX_LIMIT_SPEED'] > abs($location['speed'] - $rec['SPEED']))
+                    $this->sendToGps($location);
                 $rec['SPEED'] = $location['speed'];
-                $this->sendToGps($location);
             }
         }
+        
         $rec['LASTUPDATE'] = date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000));
         $rec['ADDRESS'] = $location['address'];
         $rec['LAT'] = $location['lat'];
@@ -311,6 +319,7 @@ function usual(&$out) {
             $rec['NAME'] = $location['name'];
             $rec['FULLNAME'] = $location['fullname'];
             $rec['IMAGE'] = $location['image'];
+            $rec['SPEED'] = 0;
             $rec['ID']=SQLInsert('google_locations', $rec); // adding new record
         }
     }
@@ -493,7 +502,8 @@ public function get_headers_from_curl_response($response) {
      * @access public
      */
  function uninstall() {
-        unsubscribeFromEvent($this->name, 'MINUTELY'); 
+        unsubscribeFromEvent($this->name, 'MINUTELY');
+        SQLExec('DROP TABLE IF EXISTS google_locations');
         parent::uninstall();
     }
     /**
