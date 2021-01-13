@@ -432,7 +432,7 @@ function usual(&$out) {
  }
  
  public function getLocationData($cookie_file) {
-    $url = 'https://www.google.com/maps/preview/locationsharing/read?authuser=0&hl='.SETTINGS_SITE_LANGUAGE.'&gl='.SETTINGS_SITE_LANGUAGE.'&pb=';
+    $url = 'https://www.google.com/maps/rpc/locationsharing/read?authuser=0&hl='.SETTINGS_SITE_LANGUAGE.'&gl='.SETTINGS_SITE_LANGUAGE.'&pb=';
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
