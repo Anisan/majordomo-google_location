@@ -437,10 +437,14 @@ function usual(&$out) {
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     curl_setopt($ch, CURLOPT_HEADER, 1);
+    curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
+    curl_setopt($ch, CURLOPT_VERBOSE, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+	 
     $response = curl_exec($ch);
     $info = curl_getinfo($ch);
     curl_close($ch);
