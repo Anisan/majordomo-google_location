@@ -460,6 +460,9 @@ function usual(&$out) {
     $this->debug($result);
     $result = json_decode($result, true);
     if (!isset($result[9]) && !isset($result[0])) {
+	if(method_exists($this, 'sendnotification')) {
+		$this->sendnotification('Проблема с cookie файлом!', 'danger');
+	}
         throw new Exception('Error json data : ' . json_encode($result));
     }
     return $result;
