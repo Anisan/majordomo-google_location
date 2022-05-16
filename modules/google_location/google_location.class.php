@@ -279,6 +279,17 @@ function usual(&$out) {
         $this->updateLocation();
   }
  }
+ 
+     // Find data in module
+ function findData($data) {
+    $res = array();
+    $cmds = SQLSelect("SELECT `ID`,`NAME` FROM `google_locations` where `NAME` like '%" . DBSafe($data) . "%' OR `FULLNAME` like '%" . DBSafe($data) . "%' OR `ID_USER` like '%" . DBSafe($data) . "%' OR `ADDRESS` like '%" . DBSafe($data) . "%'  order by NAME");
+    foreach($cmds as $cmd){
+        $res[]= '<a href="/panel/google_location.html?md=google_location&inst=adm&view_mode=user_edit&id=' . $cmd['ID'] . '.html">' . $cmd['NAME'].'</a>';
+    }
+    return $res;
+ }
+ 
  public function updateLocation() {
     $locations = [];
     $directory_cookies=ROOT."cms/cached/google_location/";
