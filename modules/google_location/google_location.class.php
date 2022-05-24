@@ -300,8 +300,17 @@ function usual(&$out) {
     }
     foreach ($locations as $location) {
         $rec = SQLSelectOne("select * from google_locations where ID_USER='".$location["id"]."'");
+        
         if ($location['lat'] == 0 && $location['lon'] == 0)
+        {
+            if (time() - strtotime($rec["LASTUPDATE"]) > 24*60*60)
+            {
+                if(method_exists($this, 'sendnotification')) {
+                    $this->sendnotification('Некорректные данные пользователя '.$rec['FULLNAME'].' , проверьте настройки!', 'warning');
+                }
+            }
             continue;
+        }
         
         if ($rec['ID']) {
             if ($rec['LASTUPDATE'] != date('Y-m-d H:i:s' ,(int)($location['timestamp']/1000)) && $rec["SENDTOGPS"]==1)
@@ -312,6 +321,13 @@ function usual(&$out) {
                 if ($this->config['MAX_LIMIT_SPEED'] > abs($location['speed'] - $rec['SPEED']))
                     $this->sendToGps($location);
                 $rec['SPEED'] = $location['speed'];
+            }
+            
+            if (time() - strtotime($rec["LASTUPDATE"]) > 24*60*60)
+            {
+                if(method_exists($this, 'sendnotification')) {
+                    $this->sendnotification('Данные пользователя '.$rec['FULLNAME'].' не обновляются, проверьте настройки!', 'warning');
+                }
             }
         }
         
@@ -332,7 +348,19 @@ function usual(&$out) {
             $rec['IMAGE'] = $location['image'];
             $rec['SPEED'] = 0;
             $rec['ID']=SQLInsert('google_locations', $rec); // adding new record
+            if(method_exists($this, 'sendnotification')) {
+                $this->sendnotification('Добавлен новый пользователь '.$rec['FULLNAME'], 'info');
+            }
+
         }
+    }
+    
+    $ids = implode(",", array_column($locations, 'id'));
+    $locs = SQLSelect("select * from google_locations where ID_USER not in (".$lds.")");
+    foreach ($locs as $loc) {
+        if(method_exists($this, 'sendnotification')) {
+            $this->sendnotification('Данные пользователя '.$rec['FULLNAME'].' не приходят, проверьте настройки Share Location!', 'warning');
+        }   
     }
     $this->config['LAST_UPDATE'] = date('Y-m-d H:i:s');
     $this->saveConfig();
