@@ -356,11 +356,14 @@ function usual(&$out) {
     }
     
     $ids = implode(",", array_column($locations, 'id'));
-    $locs = SQLSelect("select * from google_locations where ID_USER not in (".$lds.")");
-    foreach ($locs as $loc) {
-        if(method_exists($this, 'sendnotification')) {
-            $this->sendnotification('Данные пользователя '.$rec['FULLNAME'].' не приходят, проверьте настройки Share Location!', 'warning');
-        }   
+    if ($ids)
+    {
+        $locs = SQLSelect("select * from google_locations where ID_USER not in (".$ids.")");
+        foreach ($locs as $loc) {
+            if(method_exists($this, 'sendnotification')) {
+                $this->sendnotification('Данные пользователя '.$rec['FULLNAME'].' не приходят, проверьте настройки Share Location!', 'warning');
+            }   
+        }
     }
     $this->config['LAST_UPDATE'] = date('Y-m-d H:i:s');
     $this->saveConfig();
